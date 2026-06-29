@@ -6,9 +6,9 @@
   <groupId>com.jaimeprada</groupId>
   <artifactId>user-lib</artifactId>
   <version>1.0.0</version>
+  <packaging>jar</packaging>
 
   <name>user-lib</name>
-  <!-- FIXME change it to the project's website -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
