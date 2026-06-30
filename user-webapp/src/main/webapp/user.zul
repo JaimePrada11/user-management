@@ -11,11 +11,18 @@
 
         <!-- HEADER -->
         <div sclass="app-header">
-            <vlayout>
-                <label value="User Management" sclass="app-title"/>
-                <label value="Manage your team's users"
-                       sclass="app-subtitle"/>
-            </vlayout>
+            <hlayout width="100%" valign="center" sclass="app-header-row">
+                <vlayout hflex="1">
+                    <label value="User Management" sclass="app-title"/>
+                    <label value="Manage your team's users"
+                           sclass="app-subtitle"/>
+                </vlayout>
+
+                <hlayout valign="center" sclass="session-box">
+                    <label id="lblLogged" sclass="session-user"/>
+                    <button id="btnLogout" label="Logout" sclass="btn btn-secondary"/>
+                </hlayout>
+            </hlayout>
         </div>
 
         <!-- BODY -->
@@ -93,6 +100,9 @@
                     <button id="btnEditFromDetails"
                             label="View"
                             sclass="btn btn-edit"/>
+                    <button id="btnDeactivateFromDetails"
+                            label="Deactivate"
+                            sclass="btn btn-secondary"/>
                     <button id="btnDeleteFromDetails"
                             label="Delete"
                             sclass="btn btn-delete"/>
