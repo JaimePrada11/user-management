@@ -62,14 +62,6 @@
 			<version>42.7.3</version>
 		</dependency>
 
-		<!--
-		    IMPORTANTE: zk.version = 9.6.0-Eval usa internamente javax.servlet.
-		    Si usas jakarta.servlet-api aqui, Jetty no puede resolver clases
-		    como javax.servlet.ServletRequestAttributeListener que ZK requiere
-		    internamente, y el contexto falla al arrancar.
-		    Si en el futuro quieres usar jakarta.*, cambia zk.version a "9.6.0-jakarta"
-		    (o "9.6.0-jakarta-Eval") Y esta dependencia a jakarta.servlet:jakarta.servlet-api.
-		-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
