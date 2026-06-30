@@ -7,6 +7,8 @@ import com.jaimeprada.model.Role;
 import com.jaimeprada.model.User;
 import com.jaimeprada.service.UserService;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -30,7 +32,15 @@ public class UserController extends SelectorComposer<Component> {
     @Wire
     private Label lblUserCount;
 
-    // --- Modal Form ---
+    @Wire
+    private Label lblLogged;
+
+    @Wire
+    private Button btnNewUser;
+
+    private boolean isAdmin;
+
+    // Modal Form
     @Wire("#winUserForm")
     private Window winUserForm;
 
@@ -50,7 +60,7 @@ public class UserController extends SelectorComposer<Component> {
     @Wire("#winUserForm #lblPasswordHint")
     private Label lblPasswordHint;
 
-    // --- Detail Panel ---
+    // Detail Panel
     @Wire
     private Vlayout detailsPanel;
 
@@ -70,6 +80,9 @@ public class UserController extends SelectorComposer<Component> {
     private Button btnEditFromDetails;
 
     @Wire
+    private Button btnDeactivateFromDetails;
+
+    @Wire
     private Button btnDeleteFromDetails;
 
     @Wire
@@ -77,6 +90,7 @@ public class UserController extends SelectorComposer<Component> {
 
     private Long editingId;
     private Long selectedId;
+    private boolean selectedActive;
 
     private List<User> allUsers;
     private String currentSearch = "";
@@ -85,10 +99,31 @@ public class UserController extends SelectorComposer<Component> {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
 
+        User loggedInUser = (User) Sessions.getCurrent().getAttribute(LoginController.SESSION_USER);
+
+        if (loggedInUser == null) {
+            Executions.sendRedirect("login.zul");
+            return;
+        }
+
+        lblLogged.setValue(loggedInUser.getFullName());
+        isAdmin = loggedInUser.getRole() == Role.ADMIN;
+
+        btnNewUser.setVisible(isAdmin);
+        btnEditFromDetails.setVisible(true);
+        btnDeactivateFromDetails.setVisible(isAdmin);
+        btnDeleteFromDetails.setVisible(isAdmin);
+
         userService = AppContext.getInstance().getUserService();
 
         loadUsers();
         showEmptyDetails();
+    }
+
+    @Listen("onClick = #btnLogout")
+    public void onClickLogout() {
+        Sessions.getCurrent().invalidate();
+        Executions.sendRedirect("login.zul");
     }
 
     // Modal
@@ -158,10 +193,11 @@ public class UserController extends SelectorComposer<Component> {
 
     private void openForm() {
         winUserForm.setVisible(true);
-        winUserForm.doModal();
+        winUserForm.setMode(Window.Mode.MODAL);
     }
 
     private void closeForm() {
+        winUserForm.setMode(Window.Mode.EMBEDDED);
         winUserForm.setVisible(false);
     }
 
@@ -207,7 +243,7 @@ public class UserController extends SelectorComposer<Component> {
     // User List
 
     private void loadUsers() {
-        allUsers = userService.findAll();
+        allUsers = isAdmin ? userService.findAll() : userService.findAllActive();
         applyFilterAndRender();
     }
 
@@ -259,17 +295,10 @@ public class UserController extends SelectorComposer<Component> {
             item.appendChild(new Listcell(u.getFullName()));
 
             Listcell emailCell = new Listcell();
-            Label emailLabel = new Label(u.getEmail());
+            Label emailLabel = new Label(u.getEmail().toLowerCase());
             emailLabel.setSclass("email-link");
             emailCell.appendChild(emailLabel);
             item.appendChild(emailCell);
-
-
-            Listcell roleCell = new Listcell();
-            Label roleLabel = new Label(u.getRole().name());
-            roleLabel.setSclass("badge badge-role");
-            roleCell.appendChild(roleLabel);
-            item.appendChild(roleCell);
 
 
             Listcell statusCell = new Listcell();
@@ -283,12 +312,8 @@ public class UserController extends SelectorComposer<Component> {
             Hlayout actionBox = new Hlayout();
             actionBox.setSclass("action-cell");
 
-            Button btnView = new Button("Edit");
-            Button btnDelete = new Button("Save");
-
+            Button btnView = new Button("View");
             btnView.setSclass("btn btn-sm btn-edit");
-            btnDelete.setSclass("btn btn-sm btn-delete");
-
             btnView.addEventListener(
                     Events.ON_CLICK,
                     e -> {
@@ -296,14 +321,29 @@ public class UserController extends SelectorComposer<Component> {
                         showDetails(u.getId());
                     }
             );
-
-            btnDelete.addEventListener(
-                    Events.ON_CLICK,
-                    e -> SoftdeleteUser(u.getId())
-            );
-
             actionBox.appendChild(btnView);
-            actionBox.appendChild(btnDelete);
+
+            if (isAdmin) {
+                Button btnDeactivate = new Button(u.isActive() ? "Deactivate" : "Activate");
+                Button btnDelete = new Button("Delete");
+
+                btnDeactivate.setSclass("btn btn-sm btn-secondary");
+                btnDelete.setSclass("btn btn-sm btn-delete");
+
+                btnDeactivate.addEventListener(
+                        Events.ON_CLICK,
+                        e -> toggleActiveStatus(u.getId(), u.isActive())
+                );
+
+                btnDelete.addEventListener(
+                        Events.ON_CLICK,
+                        e -> permanentlyDeleteUser(u.getId())
+                );
+
+                actionBox.appendChild(btnDeactivate);
+                actionBox.appendChild(btnDelete);
+            }
+
             actionCell.appendChild(actionBox);
 
             item.appendChild(actionCell);
@@ -335,11 +375,14 @@ public class UserController extends SelectorComposer<Component> {
             User user = userService.getUserById(id);
 
             selectedId = user.getId();
+            selectedActive = user.isActive();
 
             lblDetailUsername.setValue(user.getUsername());
             lblDetailFullName.setValue(user.getFullName());
-            lblDetailEmail.setValue(user.getEmail());
+            lblDetailEmail.setValue(user.getEmail().toLowerCase());
             lblDetailStatus.setValue(user.isActive() ? "Active" : "Inactive");
+
+            btnDeactivateFromDetails.setLabel(user.isActive() ? "Deactivate" : "Activate");
 
             detailsPanel.setVisible(true);
 
@@ -374,10 +417,17 @@ public class UserController extends SelectorComposer<Component> {
         }
     }
 
+    @Listen("onClick = #btnDeactivateFromDetails")
+    public void onClickDeactivateFromDetails() {
+        if (selectedId != null) {
+            toggleActiveStatus(selectedId, selectedActive);
+        }
+    }
+
     @Listen("onClick = #btnDeleteFromDetails")
     public void onClickDeleteFromDetails() {
         if (selectedId != null) {
-            SoftdeleteUser(selectedId);
+            permanentlyDeleteUser(selectedId);
         }
     }
 
@@ -413,10 +463,12 @@ public class UserController extends SelectorComposer<Component> {
         }
     }
 
-    private void SoftdeleteUser(Long id) {
+    private void toggleActiveStatus(Long id, boolean currentlyActive) {
+
+        String action = currentlyActive ? "deactivate" : "activate";
 
         Messagebox.show(
-                "¿Do you want to delete this user?",
+                "Do you want to " + action + " this user?",
                 "Confirmation",
                 Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
@@ -426,7 +478,46 @@ public class UserController extends SelectorComposer<Component> {
 
                         try {
 
-                            userService.softDeleteUser(id);
+                            if (currentlyActive) {
+                                userService.softDeleteUser(id);
+                            } else {
+                                userService.restoreUser(id);
+                            }
+
+                            loadUsers();
+
+                            if (id.equals(selectedId)) {
+                                showDetails(id);
+                            }
+
+                        } catch (UserNotFoundException e) {
+
+                            Messagebox.show(
+                                    e.getMessage(),
+                                    "Error",
+                                    Messagebox.OK,
+                                    Messagebox.ERROR
+                            );
+                        }
+                    }
+                }
+        );
+    }
+
+    private void permanentlyDeleteUser(Long id) {
+
+        Messagebox.show(
+                "Do you want to permanently delete this user? This action cannot be undone.",
+                "Confirmation",
+                Messagebox.YES | Messagebox.NO,
+                Messagebox.QUESTION,
+                event -> {
+
+                    if (Messagebox.ON_YES.equals(event.getName())) {
+
+                        try {
+
+                            userService.deleteUser(id);
 
                             loadUsers();
 
