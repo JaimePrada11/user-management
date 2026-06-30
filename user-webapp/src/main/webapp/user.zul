@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="User Management" contentType="text/html;charset=UTF-8"?>
+
+<zk>
+
+    <style src="/css/main.css" />
+
+    <window apply="com.jaimeprada.controller.UserController"
+            border="none"
+            width="100%">
+
+        <!-- HEADER -->
+        <div sclass="app-header">
+            <vlayout>
+                <label value="User Management" sclass="app-title"/>
+                <label value="Manage your team's users"
+                       sclass="app-subtitle"/>
+            </vlayout>
+        </div>
+
+        <!-- BODY -->
+        <hlayout width="100%" spacing="16px" sclass="app-body">
+
+            <!-- Table -->
+            <vlayout hflex="1" sclass="table-panel">
+
+                <hlayout sclass="toolbar" valign="center" width="100%">
+
+                    <hlayout valign="center" sclass="heading-row">
+                        <label value="Users" sclass="panel-title"/>
+                        <label id="lblUserCount" value="0" sclass="count-badge"/>
+                    </hlayout>
+
+                    <hlayout sclass="toolbar-filters" valign="center">
+                        <textbox id="tbSearch"
+                                 placeholder="Search by name, username, or email..."
+                                 instant="true"
+                                 sclass="search-box"
+                                 width="260px"/>
+
+                        <button id="btnNewUser"
+                                label="+ New User"
+                                sclass="btn btn-primary"/>
+                    </hlayout>
+
+                </hlayout>
+
+                <listbox id="lbUsers"
+                         sclass="user-list"
+                         width="100%"
+                         mold="paging"
+                         pageSize="8"
+                         emptyMessage="There are no registered users.">
+
+                    <listhead sizable="true">
+                        <listheader label="ID" width="55px"/>
+                        <listheader label="Username" width="130px"/>
+                        <listheader label="FullName" hflex="2"/>
+                        <listheader label="Email" hflex="2"/>
+                        <listheader label="Status" width="110px"/>
+                        <listheader label="Actions" width="150px" align="center"/>
+                    </listhead>
+
+                </listbox>
+
+            </vlayout>
+
+            <!-- Details panel -->
+            <vlayout id="detailsPanel" width="300px" sclass="details-panel" visible="false">
+
+                <hlayout sclass="details-header" width="100%" valign="center">
+                    <label value="User Details" sclass="panel-title"/>
+                    <button id="btnCloseDetails" label="✕" sclass="btn-close"/>
+                </hlayout>
+
+                <vlayout sclass="details-fields">
+
+                    <label sclass="details-label" value="Username"/>
+                    <label id="lblDetailUsername" sclass="details-value"/>
+
+                    <label sclass="details-label" value="FullName"/>
+                    <label id="lblDetailFullName" sclass="details-value"/>
+
+                    <label sclass="details-label" value="Email"/>
+                    <label id="lblDetailEmail" sclass="details-value"/>
+
+                    <label sclass="details-label" value="Status"/>
+                    <label id="lblDetailStatus" sclass="details-value"/>
+
+                </vlayout>
+
+                <hlayout sclass="details-actions">
+                    <button id="btnEditFromDetails"
+                            label="View"
+                            sclass="btn btn-edit"/>
+                    <button id="btnDeleteFromDetails"
+                            label="Delete"
+                            sclass="btn btn-delete"/>
+                </hlayout>
+
+            </vlayout>
+
+        </hlayout>
+
+        <!-- MODAL: Create/Edit -->
+        <window id="winUserForm"
+                title="New User"
+                border="normal"
+                width="380px"
+                closable="true"
+                visible="false"
+                sclass="user-modal">
+
+            <vlayout sclass="form-fields">
+
+                <label value="FullName" sclass="form-label"/>
+                <textbox id="tbFullName"
+                         placeholder="Ej: Sara Prada"
+                         width="100%"/>
+
+                <label value="Username" sclass="form-label"/>
+                <textbox id="tbUsername"
+                         placeholder="Ej: sprada1"
+                         width="100%"/>
+
+                <label value="Email" sclass="form-label"/>
+                <textbox id="tbEmail"
+                         placeholder="Ej: sara@example.com"
+                         width="100%"/>
+
+                <label value="Password" sclass="form-label"/>
+                <textbox id="tbPassword"
+                         type="password"
+                         placeholder="••••••••"
+                         width="100%"/>
+
+                <label id="lblPasswordHint"
+                       value="Leave blank to keep the current password."
+                       sclass="hint-label"
+                       visible="false"/>
+
+
+            </vlayout>
+
+            <hlayout sclass="form-actions">
+
+                <button id="btnSave"
+                        label="Save"
+                        sclass="btn btn-primary"/>
+
+                <button id="btnCancel"
+                        label="Cancel"
+                        sclass="btn btn-secondary"/>
+
+            </hlayout>
+
+        </window>
+
+    </window>
+
+</zk>
