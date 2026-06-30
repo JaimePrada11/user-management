@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Login - User Management" contentType="text/html;charset=UTF-8"?>
+
+<zk>
+
+    <style src="/css/main.css" />
+
+    <window apply="com.jaimeprada.controller.LoginController"
+            border="none"
+            width="100%"
+            sclass="login-page">
+
+        <vlayout sclass="login-card" hflex="1">
+
+            <vlayout sclass="login-header">
+                <label value="User Management" sclass="app-title"/>
+                <label value="Log in to continue" sclass="app-subtitle"/>
+            </vlayout>
+
+            <vlayout sclass="form-fields" width="280px">
+
+                <label value="Username" sclass="form-label"/>
+                <textbox id="tbUsername"
+                         placeholder="Ej: sprada1"
+                         width="100%"/>
+
+                <label value="Password" sclass="form-label"/>
+                <textbox id="tbPassword"
+                         type="password"
+                         placeholder="••••••••"
+                         width="100%"/>
+
+                <label id="lblError"
+                       sclass="error-label"
+                       visible="false"/>
+
+                <button id="btnLogin"
+                        label="Login"
+                        sclass="btn btn-primary"
+                        width="100%"/>
+
+                <a href="register.zul" sclass="register-link" label="Don't have an account? Sign up."/>
+
+            </vlayout>
+
+        </vlayout>
+
+    </window>
+
+</zk>
