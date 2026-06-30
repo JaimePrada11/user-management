@@ -1,6 +1,8 @@
 package com.jaimeprada.config;
 
 import com.jaimeprada.repository.UserRepositoryImpl;
+import com.jaimeprada.security.Authenticator;
+import com.jaimeprada.security.UserAuthenticator;
 import com.jaimeprada.service.UserService;
 import com.jaimeprada.service.UserServiceImpl;
 
@@ -9,10 +11,11 @@ public class AppContext {
     private static AppContext instance;
 
     private final UserService userService;
+    private final Authenticator authenticator;
 
     private AppContext() {
         this.userService = new UserServiceImpl(new UserRepositoryImpl());
-
+        this.authenticator = new UserAuthenticator(new UserRepositoryImpl());
     }
 
     public static void init() {
@@ -30,6 +33,10 @@ public class AppContext {
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
     }
 
 }
