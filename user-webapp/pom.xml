@@ -1,18 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.jaimeprada</groupId>
+
+	<parent>
+		<groupId>com.jaimeprada</groupId>
+		<artifactId>user-management</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
 	<artifactId>user-webapp</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+
 	<properties>
-		<zk.version>9.6.0</zk.version>
+		<zk.version>9.6.0-Eval</zk.version>
 		<commons-io>2.6</commons-io>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<packname>-${project.version}-FL-${maven.build.timestamp}</packname>
 	</properties>
-	<packaging>war</packaging>
+
 	<name>The user-webapp Project</name>
 	<description>The user-webapp Project</description>
+
 	<licenses>
 		<license>
 			<name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
@@ -20,6 +28,7 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
 	<repositories>
 		<repository>
 			<id>ZK CE</id>
@@ -39,7 +48,10 @@
 			<url>https://mavensync.zkoss.org/maven2/</url>
 		</pluginRepository>
 	</pluginRepositories>
+
 	<dependencies>
+
+
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkbind</artifactId>
@@ -47,7 +59,18 @@
 		</dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
-			<artifactId>zul</artifactId>
+			<artifactId>zkmax</artifactId>
+			<version>${zk.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sf.jasperreports</groupId> <!-- Exclude jasperreports for ZK-4860-->
+					<artifactId>jasperreports</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.zk</groupId>
+			<artifactId>zuti</artifactId>
 			<version>${zk.version}</version>
 		</dependency>
 		<dependency>
@@ -80,18 +103,14 @@
 						<contextPath>/${project.artifactId}</contextPath>
 						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
 					</webApp>
-					<!-- <scanIntervalSeconds>5</scanIntervalSeconds> -->
 				</configuration>
 			</plugin>
 			<!-- Compile java -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>8</source>
-					<target>8</target>
-				</configuration>
+				<version>3.14.1</version>
+
 			</plugin>
 			<!-- Build war -->
 			<plugin>
