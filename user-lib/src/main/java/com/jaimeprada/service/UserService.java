@@ -19,4 +19,6 @@ public interface UserService {
     User getUserByEmail(String email);
 
     void deleteUser(Long id);
+
+    void softDeleteUser(Long id);
 }

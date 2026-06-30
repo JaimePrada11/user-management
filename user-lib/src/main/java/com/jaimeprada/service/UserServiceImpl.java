@@ -95,8 +95,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("Email: " + email));
     }
 
+
     @Override
-    public void deleteUser(Long id) {
+    public void softDeleteUser(Long id) {
         boolean deleted = userRepository.softDelete(id);
 
         if(!deleted) {
@@ -104,6 +105,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.delete(id);
+    }
 
     private void validateUser(User user) {
         if (user == null) throw new IllegalArgumentException("User is required");
