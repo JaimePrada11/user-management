@@ -12,6 +12,8 @@ public interface UserService {
 
     List<User> findAll();
 
+    List<User> findAllActive();
+
     User getUserById(Long id);
 
     User getUserByUsername(String username);
@@ -21,4 +23,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     void softDeleteUser(Long id);
+
+    void restoreUser(Long id);
 }

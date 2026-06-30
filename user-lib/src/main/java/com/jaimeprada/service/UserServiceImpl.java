@@ -78,6 +78,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> findAllActive() {
+        return userRepository.findAllByActive();
+    }
+
+    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("ID: " + id));
@@ -108,6 +113,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.delete(id);
+    }
+
+    @Override
+    public void restoreUser(Long id) {
+        userRepository.restore(id);
     }
 
     private void validateUser(User user) {

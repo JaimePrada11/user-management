@@ -27,11 +27,10 @@ public interface UserRepository {
 
     List<User> findAllByActive();
 
-    List<User> findAllDeleted();
-
     boolean delete(Long id);
 
     boolean softDelete(Long id);
 
+    boolean restore(Long id);
 
 }

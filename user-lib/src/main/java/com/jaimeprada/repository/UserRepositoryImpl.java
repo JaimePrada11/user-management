@@ -129,12 +129,6 @@ public class UserRepositoryImpl  implements UserRepository {
     }
 
     @Override
-    public List<User> findAllDeleted() {
-       String sql = "SELECT * FROM users WHERE active = false";
-        return getUsers(sql);
-    }
-
-    @Override
     public boolean delete(Long id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
@@ -158,8 +152,23 @@ public class UserRepositoryImpl  implements UserRepository {
                 WHERE id = ?
                 """;
 
+        return changeStatus(id, sql);
+    }
+
+    @Override
+    public boolean restore(Long id) {
+        String sql = """
+                UPDATE users
+                SET active = true,
+                    updated_at = ?
+                WHERE id = ?
+                """;
+        return changeStatus(id, sql);
+    }
+
+    private boolean changeStatus(Long id, String sql) {
         try(Connection conn = getConn();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             ps.setLong(2, id);
